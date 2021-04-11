@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>{{title}}</title>
+ </head>
+ <body>
+ <h3> Общество </h3>
+ <h3> Имя фамилия логин балл</h3>
+  <table border="1">
+      {% for student in students %}
+   <tr>
+    <th>{{student.name}}</th>
+       <th>{{student.surname}}</th>
+       <th>{{student.login}}</th>
+       <th>{{student.password}}</th>
+       <th>{{student.ball}}</th>
+   </tr>
+      {% endfor %}
+ </table>
+
+
+
+</html>

@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+ <head>
+  <meta charset="utf-8">
+  <title>{{title}}</title>
+ </head>
+ <body>
+ <h3> Тест по обществу </h3>
+ <form class="test_form" method="post">
+      {% for question in questions %}
+    {% if question.image is not None %}
+        <img src={{question.image}}
+            alt="здесь должна была быть картинка, но не нашлась">
+    {% endif %}
+       <h3>{{question.text}}</h3>
+     <div>
+       <p><input name=f'{{question.id}}' type="radio" value=f'{{question.var[0]}}'> {{question.var[0]}}</p>
+       <p><input name=f'{{question.id}}' type="radio" value=f"{{question.var[1]}}"> {{question.var[1]}}</p>
+       <p><input name=f'{{question.id}}' type="radio" value=f"{{question.var[2]}}"> {{question.var[2]}}</p>
+       <p><input name=f'{{question.id}}' type="radio" value=f"{{question.var[3]}}"> {{question.var[3]}}</p>
+         </div>
+      {% endfor %}
+
+ <button type="submit" class="btn btn-primary">Сдать</button>
+     </form>
+ </body>

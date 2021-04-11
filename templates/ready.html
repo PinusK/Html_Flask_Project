@@ -1,0 +1,12 @@
+{% extends "base.html" %}
+
+{% block content %}
+<h1>Записи в блоге</h1>
+<br>
+{% if ball = 0 %}
+    <h1><a href=f"/user_student/{{user.login}}" class="btn btn-secondary">Пройти тест</a></h1>
+{% else %}
+    <h1><a href=f"/user_student/{{user.login}}" class="btn btn-secondary"> Здравствуйте {{user.name}} {{user.surname}},
+        Ваш бал: {{user.ball}}</a></h1>
+{% endif %}
+{% endblock %}
