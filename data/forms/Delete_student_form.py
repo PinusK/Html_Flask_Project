@@ -4,6 +4,7 @@ from wtforms.validators import DataRequired
 
 
 class DeleteStudentForm(FlaskForm):
-    login = StringField('логин', validators=[DataRequired()])
-    password = PasswordField('Пароль', validators=[DataRequired()])
+    login = StringField('логин ученика', validators=[DataRequired()])
+    password = PasswordField('Пароль учителя', validators=[DataRequired()])
     submit = SubmitField('удалить')
+

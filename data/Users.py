@@ -13,10 +13,10 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
                            primary_key=True, autoincrement=True)
     name = sqlalchemy.Column(sqlalchemy.String, nullable=True)
     surname = sqlalchemy.Column(sqlalchemy.String, nullable=True)
-    login = sqlalchemy.Column(sqlalchemy.String, primary_key=True, nullable=True)
-    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    login = sqlalchemy.Column(sqlalchemy.String, unique=True, nullable=False)
+    hashed_password = sqlalchemy.Column(sqlalchemy.String, nullable=False)
     klass = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
-    ball = sqlalchemy.Column(sqlalchemy.String, nullable=True)
+    ball = sqlalchemy.Column(sqlalchemy.Integer, nullable=True)
     is_teacher = sqlalchemy.Column(sqlalchemy.Boolean, default=False)
     questions_id = sqlalchemy.Column(sqlalchemy.String, nullable=True)
 
@@ -24,7 +24,7 @@ class User(SqlAlchemyBase, UserMixin, SerializerMixin):
         return str('<user>' + str(self.id) + ' ' + self.surname + ' ' + self.name)
 
     def set_password(self, password):
-        self.hashed_password = generate_password_hash(password)
+        self.hashed_password = password
 
     def check_password(self, password):
         return check_password_hash(self.hashed_password, password)

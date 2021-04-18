@@ -8,16 +8,16 @@
  <h3> Тест по обществу </h3>
  <form class="test_form" method="post">
       {% for question in questions %}
-    {% if question.image is not None %}
-        <img src={{question.image}}
+    {% if question.photo_way %}
+        <img src={{question.photo_way}}
             alt="здесь должна была быть картинка, но не нашлась">
     {% endif %}
-       <h3>{{question.text}}</h3>
+       <h3>{{loop.index}}. {{question.question}}</h3>
      <div>
-       <p><input name=f'{{question.id}}' type="radio" value=f'{{question.var[0]}}'> {{question.var[0]}}</p>
-       <p><input name=f'{{question.id}}' type="radio" value=f"{{question.var[1]}}"> {{question.var[1]}}</p>
-       <p><input name=f'{{question.id}}' type="radio" value=f"{{question.var[2]}}"> {{question.var[2]}}</p>
-       <p><input name=f'{{question.id}}' type="radio" value=f"{{question.var[3]}}"> {{question.var[3]}}</p>
+       <p><input name='{{question.id}}' type="radio" value='{{ans_opt[loop.index0][0]}}'> {{ans_opt[loop.index0][0]}}</p>
+       <p><input name='{{question.id}}' type="radio" value='{{ans_opt[loop.index0][1]}}'> {{ans_opt[loop.index0][1]}}</p>
+       <p><input name='{{question.id}}' type="radio" value='{{ans_opt[loop.index0][2]}}'> {{ans_opt[loop.index0][2]}}</p>
+       <p><input name='{{question.id}}' type="radio" value='{{ans_opt[loop.index0][3]}}'> {{ans_opt[loop.index0][3]}}</p>
          </div>
       {% endfor %}
 

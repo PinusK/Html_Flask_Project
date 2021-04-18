@@ -1,13 +1,13 @@
 from flask import Flask, redirect, request, abort, jsonify, make_response
-from data import db_session
-from data.Users import User
-from data.Test_model import Test
+from Proect.data import db_session
+from Proect.data.Users import User
+from Proect.data.Test_model import Test
 from flask import render_template
-# from Proect.data.forms.registerform import RegisterForm
+from Proect.data.forms.RegisterForm import RegistForm
 from flask_login import LoginManager, login_user, logout_user, login_required, current_user
-from data.forms.loginform import LoginForm
-from data.resourses.user_resourses import UserListResource, UserResource
-from data.forms.Delete_student_form import DeleteStudentForm
+from Proect.data.forms.loginform import LoginForm
+from Proect.data.resourses.user_resourses import UserListResource, UserResource
+from Proect.data.forms.Delete_student_form import DeleteStudentForm
 # from Proect.data.forms.news_form import NewsForm
 # from Proect.data.forms.jobs_Form import Jobs_Form
 # from Proect.data.resourses import users_resource, news_resources, jobs_resource
@@ -47,12 +47,13 @@ def login():
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         user = db_sess.query(User).filter(User.login == form.login.data).first()
-        if user and user.check_password(form.password.data):
+        if user and user.hashed_password == form.password.data:
             login_user(user, remember=form.remember_me.data)
-            if user.teacher:
+            if user.is_teacher:
+                print(1)
                 return redirect("/user_teacher")
-            elif user.teacher:
-                return redirect("/user_student")
+            else:
+                return redirect("/user_student_entrance")
         return render_template('login.html',
                                message="Неправильный логин или пароль",
                                form=form)
@@ -60,32 +61,35 @@ def login():
 
 
 @app.route('/user_teacher', methods=['GET', 'POST'])
-def login():
+def teacher_login():
+    print(2)
     db_sess = db_session.create_session()
     sp = db_sess.query(User).filter(User.is_teacher == 0)
-    print(sp)
-    # return render_template('table_student.html', title='Таблица учеников', students=sp)
+    print(list(sp)[0].hashed_password)
+    return render_template('table_student.html', title='Таблица учеников', students=sp)
 
 
-''' @app.route('/student_delete', methods=['GET', 'POST'])
+@app.route('/student_delete', methods=['POST', 'GET'])
 @login_required
-def jobs_delete():
+def student_delete():
     form = DeleteStudentForm()
     if form.validate_on_submit():
         db_sess = db_session.create_session()
         student = db_sess.query(User).filter(User.login == form.login.data).first()
-        if student and current_user.check_password(form.password.data):
+        if student and current_user.hashed_password == form.password.data:
             db_sess.delete(student)
             db_sess.commit()
-        return render_template('login.html',
+            return redirect('/user_teacher')
+        return render_template('Delete_student.html',
                                message="Неправильный логин или пароль",
                                form=form)
-    return render_template('login.html', title='удаление ученика', form=form)
+    return render_template('Delete_student.html', title='удаление ученика', form=form)
 
 
-@app.route('/student/app', methods=['GET', 'POST'])
+@app.route('/student/app', methods=['POST', 'GET'])
 @login_required
 def student_app():
+    print(3)
     form = RegistForm()
     if form.validate_on_submit():
         if form.password.data != form.password_again.data:
@@ -93,71 +97,75 @@ def student_app():
                                    form=form,
                                    message="Пароли не совпадают")
         db_sess = db_session.create_session()
-        if db_sess.query(User).filter(User.email == form.email.data).first():
+        if db_sess.query(User).get(form.login.data):
             return render_template('register.html', title='Регистрация',
                                    form=form,
                                    message="Такой пользователь уже есть")
         user = User(
                 name=form.name.data,
-                email=form.email.data,
-        )
-        //user = User(
-            name=form.name.data,
-            surname=form.surname.data,
-            email=form.email.data,
-            age=form.age.data,
-            position=form.position.data,
-            speciality=form.speciality.data,
-            address=form.address.data,
-            modified_date=form.modified_date.data
-        )//
-        user.set_password(form.password.data)
+                surname=form.surname.data,
+                login=form.login.data,
+                ball=0)
+        user.hashed_password = form.password.data
         db_sess.add(user)
         db_sess.commit()
-        return redirect('/user_teacher')'''
-# return render_template('register.html', title='Регистрация', form=form)
+        return redirect('/user_teacher')
+    print(3)
+    return render_template('register.html', title='Регистрация', form=form)
 
 
-@app.route("/user_student_entrance/<string:log>")
-def index(log):
+@app.route("/user_student_entrance")
+def index():
     db_sess = db_session.create_session()
-    user = db_sess.query(User).filter(User.login == log)
+    user = db_sess.query(User).filter(User.login == current_user.login).first()
+    print(user.ball)
     if user.ball == 0:
         return render_template("ready.html", user=user, ball=0)
     else:
-        return render_template("ready.html", user=user, ball=user.ball)
+        return render_template("ready.html", user=user, ball=int(user.ball))
 
 
-@app.route('/user_student/<string:log>', methods=['GET', 'POST'])
-def student_login(log):
+@app.route('/user_student', methods=['GET', 'POST'])
+def student_login():
     if request.method == 'GET':
         db_sess = db_session.create_session()
         quest = db_sess.query(Test).all()
-        user = db_sess.query(User).filter(User.login == log)
+        user = db_sess.query(User).filter(User.login == current_user.login).first()
         sp = []
         sp_id = []
+        sp_ans = []
         ch = 0
         while ch != 10:
             z = random.choice(quest)
-            if z['id'] in [i[0] for i in sp]:
+            if z.id not in [i.id for i in sp]:
+                s = z.answers_options.split('\n')
+                sp_ans.append([])
+                for i in s:
+                    if i:
+                        sp_ans[-1].append(i)
                 sp.append(z)
-                sp_id.append(str(z['id']))
+                sp_id.append(str(z.id))
                 ch += 1
         user.questions_id = ' '.join(sp_id)
         db_sess.commit()
-        return render_template("Test_form.html", qustions=sp)
+        print(sp_ans)
+        return render_template("Test_form.html", questions=sp, ans_opt=sp_ans)
     elif request.method == 'POST':
         db_sess = db_session.create_session()
-        user = db_sess.query(User).filter(User.login == log)
+        user = db_sess.query(User).filter(User.login == current_user.login).first()
         quest = db_sess.query(Test).all()
         ch = 0
+        print(user.questions_id.split())
+        print(2)
+        print(str(request.form.get('10')).split(')')[0])
         for i in quest:
-            if i['id'] in user.qustions_id:
-                if request.form[str(i['id'])] == i['otvet']:
+            if str(i.id) in user.questions_id.split():
+                if str(request.form.get(str(i.id))).split(')')[0] == i.answer:
                     ch += 1
         user.ball = ch
         db_sess.commit()
-        return redirect(f"/user_student_entrance/{log}")
+        print(1)
+        return redirect("/user_student_entrance")
 
 
 @app.route('/logout')
@@ -223,11 +231,11 @@ def not_found(error):
 
 def main():
     db_session.global_init("db/blogs.db")
-    user = User()
+    '''user = User()
     user.name = 'Алексей'
     user.surname = 'Кузнецов'
     user.login = 'K1'
-    user.password = 'qwerty1'
+    user.password = user.set_password('qwerty1')
     user.is_teacher = False
     user.ball = 0
     user.klass = 10
@@ -239,7 +247,7 @@ def main():
     user.name = 'Ярослав'
     user.surname = 'Рюрикович'
     user.login = 'K2'
-    user.password = 'qwerty1'
+    user.password = user.set_password('qwerty1')
     user.is_teacher = False
     user.ball = 0
     user.klass = 10
@@ -251,11 +259,11 @@ def main():
     user.name = 'Иван'
     user.surname = 'Кузнец'
     user.login = 'K3'
-    user.password = 'qwerty1'
+    user.password = user.set_password('qwerty1')
     user.is_teacher = True
     db_sess = db_session.create_session()
     db_sess.add(user)
-    db_sess.commit()
+    db_sess.commit()'''
     app.run()
 
 

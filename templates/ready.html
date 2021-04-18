@@ -1,12 +1,15 @@
 {% extends "base.html" %}
 
 {% block content %}
-<h1>Записи в блоге</h1>
+<h1>Cтраница ученика</h1>
 <br>
-{% if ball = 0 %}
-    <h1><a href=f"/user_student/{{user.login}}" class="btn btn-secondary">Пройти тест</a></h1>
+{% if ball == 0 %}
+    <but class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#"></a>
+     <button><a class="btn btn-primary" href="/user_student">Пройти тест</a></button>
+    </but>
 {% else %}
-    <h1><a href=f"/user_student/{{user.login}}" class="btn btn-secondary"> Здравствуйте {{user.name}} {{user.surname}},
-        Ваш бал: {{user.ball}}</a></h1>
+    <h1>Здравствуйте {{user.name}} {{user.surname}},
+        Ваш бал: {{user.ball}}</h1>
 {% endif %}
 {% endblock %}

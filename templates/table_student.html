@@ -2,23 +2,51 @@
 <html>
  <head>
   <meta charset="utf-8">
+     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link rel="stylesheet"
+          href="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/css/bootstrap.min.css"
+          integrity="sha384-Vkoo8x4CGsO3+Hhxv8T/Q5PaXtkKtu6ug5TOeNV6gBiFeWPGFN9MuhOf23Q9Ifjh"
+          crossorigin="anonymous">
   <title>{{title}}</title>
  </head>
  <body>
  <h3> Общество </h3>
- <h3> Имя фамилия логин балл</h3>
+ <header>
+ <log_user class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#"></a>
+        {% if current_user.is_authenticated %}
+    <a class="navbar-brand" href="/logout">{{ current_user.name }}</a>
+        {% endif %}
+    </log_user>
+ </header>
   <table border="1">
+      <tr>
+   <th>Обществознание</th>
+   </tr>
+  <tr>
+   <th>Имя</th>
+   <th>Фамилия</th>
+   <th>Логин</th>
+   <th>Пароль</th>
+   <th>Балл</th>
+   </tr>
       {% for student in students %}
    <tr>
     <th>{{student.name}}</th>
        <th>{{student.surname}}</th>
        <th>{{student.login}}</th>
-       <th>{{student.password}}</th>
+       <th>{{student.hashed_password}}</th>
        <th>{{student.ball}}</th>
    </tr>
       {% endfor %}
  </table>
-
-
-
+<br>
+<br>
+ <nav class="navbar navbar-light bg-light">
+        <a class="navbar-brand" href="#"></a>
+        {% if current_user.is_authenticated %}
+     <button><a class="btn btn-primary" href="/student/app">Добавить ученика</a></button>
+     <button><a class="btn btn-primary" href="/student_delete">Удалить ученика</a></button>
+     {% endif %}
+    </nav>
 </html>
