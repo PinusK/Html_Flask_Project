@@ -1,4 +1,4 @@
-from flask_restful import reqparse, abort, Api, Resource
+from flask_restful import abort, Resource
 from Proect.data import db_session
 from Proect.data.Test_model import Test
 from flask import abort, jsonify
